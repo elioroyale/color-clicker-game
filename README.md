@@ -2,6 +2,7 @@
 
 Message from the owner: (We will be adding a new upgrades soon work in progress and faster auto click)
 
+Try the game: https://color-clicker-game.onrender.com
 
 Welcome to **Color Clicker Game** – a fun and simple browser-based game where clicking a button changes the background to a random color and earns you **color points**!
 
