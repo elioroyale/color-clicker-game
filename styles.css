@@ -1,0 +1,87 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f4f8;
+    color: #333;
+    text-align: center;
+    padding: 20px;
+}
+
+header {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 0;
+}
+
+h1 {
+    font-size: 2rem;
+}
+
+button {
+    background-color: #008CBA;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+button:hover {
+    background-color: #000b0e;
+}
+
+form {
+    margin-top: 20px;
+}
+
+input[type="text"] {
+    padding: 8px;
+    font-size: 1rem;
+    border-radius: 5px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+}
+
+footer {
+    margin-top: 40px;
+    font-size: 1rem;
+    color: #777;
+}
+
+#main {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Optional: center align the elements horizontally */
+    margin-top: 50px; /* Optional: add some margin at the top */
+}
+
+#colorButton, #color-clicker {
+    margin: 10px 0; /* Adds vertical space between the elements */
+}
+
+#color-clicker {
+    padding: 10px;
+    border: 3px solid #000000; /* Blue border */
+    border-radius: 5px; /* Optional: rounded corners */
+    text-align: center; /* Center the number text */
+    font-size: 24px; /* Optional: larger font size */
+}
+
+#auto-clicker-50 {
+    margin-top: 150px
+}
+
+#auto-clicker-50:disabled {
+    background-color: gray;  /* Grey background */
+    color: lightgray;        /* Light grey text */
+    cursor: not-allowed;     /* Disabled cursor */
+    border: 1px solid #ccc;  /* Optional: make the border look disabled */
+}
+
+#boost-auto-clicker {
+    background-color: rgb(248, 232, 3);
+    color: #000000;
+    display: none;
+}
