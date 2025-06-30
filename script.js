@@ -1,106 +1,164 @@
-document.addEventListener("DOMContentLoaded", function(event) {
+document.addEventListener("DOMContentLoaded", function () {
+  let clickerCounter = 0;
+  let autoClickerCount = 0; // Number of auto-clickers bought (including boosts)
+  const autoClicker50PayValue = 50;
+  const baseInterval = 1500;
+  let autoClickerIntervalId = null;
 
-    let clickerCounter = 0
-    let autoClickerPurchased = false
-    const autoClicker50PayValue = 50
-    const autoClickerInterval = 1500
+  const colorClicker = document.getElementById("color-clicker");
+  const bgButton = document.getElementById("colorButton");
+  const autoClickButton50 = document.getElementById("auto-clicker-50");
+  const boostButtonAutoClick = document.getElementById("boost-auto-clicker");
+  const saveProgressBtn = document.getElementById("saveProgressBtn");
 
-    function updateClickCounter() {
+  // === Helper to calculate interval based on autoClickerCount ===
+  function getAutoClickerInterval() {
+    return Math.max(baseInterval / autoClickerCount, 300);
+  }
 
+  // === Load saved data ===
+  let playerName = localStorage.getItem("playerName");
+  let savedPoints = localStorage.getItem("clickerCounter");
+  autoClickerCount = parseInt(localStorage.getItem("autoClickerCount")) || 0;
+  let savedColor = localStorage.getItem("backgroundColor");
+
+  if (playerName) {
+    document.getElementById("welcomePlayer").textContent =
+      `Welcome back, ${playerName}!`;
+    document.getElementById("welcomePlayer").style.display = "block";
+    document.getElementById("player-setup").style.display = "none";
+  }
+
+  if (savedPoints) {
+    clickerCounter = parseInt(savedPoints);
+  }
+
+  if (savedColor) {
+    document.body.style.backgroundColor = savedColor;
+  }
+
+  if (autoClickerCount > 0) {
+    startAutoClicker(getAutoClickerInterval());
+  }
+
+  updateClickCounter();
+
+  // === Save player name ===
+  document.getElementById("savePlayerBtn").addEventListener("click", () => {
+    const input = document.getElementById("playerNameInput");
+    playerName = input.value.trim();
+    if (playerName) {
+      localStorage.setItem("playerName", playerName);
+      document.getElementById("welcomePlayer").textContent =
+        `Welcome, ${playerName}!`;
+      document.getElementById("welcomePlayer").style.display = "block";
+      document.getElementById("player-setup").style.display = "none";
     }
+  });
 
-    const bgButton = document.getElementById("colorButton");
-    bgButton.addEventListener("click", function() {
-        const colorButton = document.getElementById("colorButton")
-        const h1Welcome = document.getElementById("h1-welcome")
+  // === Manual save progress button ===
+  saveProgressBtn.addEventListener("click", () => {
+    saveProgress();
+    alert("Progress saved!");
+  });
 
-        // colorButton.style.display = "none"
-        h1Welcome.style.display = "none"
+  // === Manual click handler ===
+  bgButton.addEventListener("click", function () {
+    document.getElementById("h1-welcome").style.display = "none";
 
-        clickerCounter++
+    clickerCounter++;
+    updateClickCounter();
+    changeBackgroundWithRandomColor();
+  });
 
-        updateAutoClickerButton()
+  // === Unlock auto-clicker ===
+  autoClickButton50.addEventListener("click", function () {
+    if (clickerCounter >= autoClicker50PayValue) {
+      clickerCounter -= autoClicker50PayValue;
+      autoClickerCount++;
+      startAutoClicker(getAutoClickerInterval());
+      updateClickCounter();
 
-        manualColorClicker()
-    });
-
-    const autoClickButton50 = document.getElementById("auto-clicker-50");
-    autoClickButton50.addEventListener("click", function() {
-        if (autoClickerPurchased === false && clickerCounter >= autoClicker50PayValue) {
-            clickerCounter -= autoClicker50PayValue
-            autoColorClicker(autoClickerInterval)
-            autoClickerPurchased = true
-        }
-    })
-
-    const boostButtonAutoClick = document.getElementById("boost-auto-clicker")
-    boostButtonAutoClick.addEventListener("click", function() {
-        if (clickerCounter >= autoClicker50PayValue) {
-            clickerCounter -= autoClicker50PayValue
-            autoColorClicker(autoClickerInterval)
-        }
-    })
-    
-
-    function manualColorClicker() {
-        const colorClicker = document.getElementById("color-clicker")
-
-        changeBackgroundWithRandomColor()
-
-        if (clickerCounter === 1) {
-            value = `${clickerCounter} Color`
-        } else {
-            value = `${clickerCounter} Colors`
-        }
-
-        colorClicker.textContent = value
+      // Auto-save progress on unlock
+      saveProgress();
     }
+  });
 
-    function autoColorClicker(interval) {
-        setInterval(() => {
-            changeBackgroundWithRandomColor()
+  // === Boost auto-clicker ===
+  boostButtonAutoClick.addEventListener("click", function () {
+    if (clickerCounter >= autoClicker50PayValue) {
+      clickerCounter -= autoClicker50PayValue;
+      autoClickerCount++;
+      startAutoClicker(getAutoClickerInterval());
+      updateClickCounter();
 
-            // update counter
-            clickerCounter++
-
-            updateAutoClickerButton()
-
-            // update
-            manualColorClicker()
-        }, interval);
+      // Auto-save progress on boost
+      saveProgress();
     }
+  });
 
-    function changeBackgroundWithRandomColor() {
-        // Random color generator
-        const randomColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
-        console.log('Random Color Value: ' ,  randomColor) 
-        document.body.style.backgroundColor = randomColor;
+  // === Start or restart auto-clicker interval ===
+  function startAutoClicker(interval) {
+    if (autoClickerIntervalId) clearInterval(autoClickerIntervalId);
+
+    autoClickerIntervalId = setInterval(() => {
+      clickerCounter++;
+      changeBackgroundWithRandomColor();
+      updateClickCounter();
+      // No auto-save here, only on unlock/boost or manual save
+    }, interval);
+
+    updateAutoClickerButtons();
+  }
+
+  // === Update UI counts and button states ===
+  function updateClickCounter() {
+    colorClicker.textContent = `${clickerCounter} ${
+      clickerCounter === 1 ? "Color" : "Colors"
+    }`;
+    updateAutoClickerButtons();
+  }
+
+  // === Enable/disable buttons based on state ===
+  function updateAutoClickerButtons() {
+    if (autoClickerCount === 0 && clickerCounter >= autoClicker50PayValue) {
+      autoClickButton50.disabled = false;
+      autoClickButton50.style.display = "inline";
+      autoClickButton50.style.backgroundColor = "";
+      autoClickButton50.style.color = "";
+      autoClickButton50.style.cursor = "pointer";
+
+      boostButtonAutoClick.disabled = true;
+      boostButtonAutoClick.style.display = "none";
+    } else if (autoClickerCount > 0) {
+      autoClickButton50.disabled = true;
+      autoClickButton50.style.display = "none";
+
+      boostButtonAutoClick.disabled = clickerCounter < autoClicker50PayValue;
+      boostButtonAutoClick.style.display = "inline";
+    } else {
+      autoClickButton50.disabled = true;
+      autoClickButton50.style.display = "none";
+
+      boostButtonAutoClick.disabled = true;
+      boostButtonAutoClick.style.display = "none";
     }
+  }
 
-    function updateAutoClickerButton() {
-        if (autoClickerPurchased === false && clickerCounter >= autoClicker50PayValue) {
-            const autoClickButton50 = document.getElementById("auto-clicker-50")
-            autoClickButton50.disabled = false
-            autoClickButton50.style.display = "inline"
+  // === Change background to random color and save it ===
+  function changeBackgroundWithRandomColor() {
+    const randomColor = `#${Math.floor(Math.random() * 16777215)
+      .toString(16)
+      .padStart(6, "0")}`;
+    document.body.style.backgroundColor = randomColor;
 
-            // Remove greyed-out appearance
-            autoClickButton50.style.backgroundColor = ""; // Reset the background color
-            autoClickButton50.style.color = "";          // Reset the text color
-            autoClickButton50.style.cursor = "pointer";  // Enable cursor pointer
-        } else if (autoClickerPurchased === true) {
-            autoClickButton50.style.display = "none"
-            autoClickButton50.disabled = true
-            
-            const boostButton = document.getElementById("boost-auto-clicker")
-            boostButton.disabled = false
-            boostButton.style.display = "inline"
-        }
-    }
+    // Save last color automatically
+    localStorage.setItem("backgroundColor", randomColor);
+  }
 
-
-    // manual click button
-
-    // auto click button for 50 colors (1 time purchase)
-
-    // boost auto clicks for 50 colors (reapeatable as long as you have collected colors)
+  // === Save progress to localStorage ===
+  function saveProgress() {
+    localStorage.setItem("clickerCounter", clickerCounter);
+    localStorage.setItem("autoClickerCount", autoClickerCount);
+  }
 });
