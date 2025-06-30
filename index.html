@@ -1,26 +1,42 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Webpage</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <div class="container">
-        <h1 id="h1-welcome">Welcome to Color clicker!</h1>
-        
-        <div id="main">
-            <div id="color-clicker"> 0 Colors</div>
-            <button id="colorButton">Click ME</button>
-        </div>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Interactive Webpage</title>
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+    <body>
+        <div class="container">
+            <button id="saveProgressBtn">Save Progress</button>
+            <h1 id="h1-welcome">Welcome to Color clicker!</h1>
 
-        <div>
-            <button id="auto-clicker-50" disabled="disabled">UNLOCK Auto Click for 50 colors</button>
-            <button id="boost-auto-clicker" disabled="disabled">BOOST Auto Click for 50 colors</button>
-        </div>
+            <div id="player-setup">
+                <input
+                    type="text"
+                    id="playerNameInput"
+                    placeholder="Enter your name"
+                />
+                <button id="savePlayerBtn">Save Name</button>
+            </div>
 
-        <script src="script.js"></script>
-    </div>
-</body>
+            <h2 id="welcomePlayer" style="display: none"></h2>
+
+            <div id="main">
+                <div id="color-clicker">0 Colors</div>
+                <button id="colorButton">Click ME</button>
+            </div>
+
+            <div>
+                <button id="auto-clicker-50" disabled="disabled">
+                    UNLOCK Auto Click for 50 colors
+                </button>
+                <button id="boost-auto-clicker" disabled="disabled">
+                    BOOST Auto Click for 50 colors
+                </button>
+            </div>
+
+            <script src="script.js"></script>
+        </div>
+    </body>
 </html>
