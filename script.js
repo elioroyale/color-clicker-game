@@ -1,20 +1,21 @@
 document.addEventListener("DOMContentLoaded", function () {
   let clickerCounter = 0;
-  let autoClickerCount = 0; // Number of auto-clickers bought (including boosts)
+  let autoClickerCount = 0;
   const autoClicker50PayValue = 50;
   const baseInterval = 1500;
   let autoClickerIntervalId = null;
+
+  // === Rebirth state ===
+  let rebirthUnlocked = localStorage.getItem("rebirthUnlocked") === "true";
+  let clickValue = rebirthUnlocked ? 10 : 1;
+  const rebirthThreshold = 1000000;
 
   const colorClicker = document.getElementById("color-clicker");
   const bgButton = document.getElementById("colorButton");
   const autoClickButton50 = document.getElementById("auto-clicker-50");
   const boostButtonAutoClick = document.getElementById("boost-auto-clicker");
   const saveProgressBtn = document.getElementById("saveProgressBtn");
-
-  // === Helper to calculate interval based on autoClickerCount ===
-  function getAutoClickerInterval() {
-    return Math.max(baseInterval / autoClickerCount, 300);
-  }
+  const rebirthButton = document.getElementById("rebirth-button");
 
   // === Load saved data ===
   let playerName = localStorage.getItem("playerName");
@@ -42,6 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   updateClickCounter();
+  checkRebirthUnlock();
 
   // === Save player name ===
   document.getElementById("savePlayerBtn").addEventListener("click", () => {
@@ -66,9 +68,10 @@ document.addEventListener("DOMContentLoaded", function () {
   bgButton.addEventListener("click", function () {
     document.getElementById("h1-welcome").style.display = "none";
 
-    clickerCounter++;
+    clickerCounter += clickValue;
     updateClickCounter();
     changeBackgroundWithRandomColor();
+    checkRebirthUnlock();
   });
 
   // === Unlock auto-clicker ===
@@ -78,8 +81,6 @@ document.addEventListener("DOMContentLoaded", function () {
       autoClickerCount++;
       startAutoClicker(getAutoClickerInterval());
       updateClickCounter();
-
-      // Auto-save progress on unlock
       saveProgress();
     }
   });
@@ -91,8 +92,6 @@ document.addEventListener("DOMContentLoaded", function () {
       autoClickerCount++;
       startAutoClicker(getAutoClickerInterval());
       updateClickCounter();
-
-      // Auto-save progress on boost
       saveProgress();
     }
   });
@@ -102,10 +101,10 @@ document.addEventListener("DOMContentLoaded", function () {
     if (autoClickerIntervalId) clearInterval(autoClickerIntervalId);
 
     autoClickerIntervalId = setInterval(() => {
-      clickerCounter++;
+      clickerCounter += clickValue;
       changeBackgroundWithRandomColor();
       updateClickCounter();
-      // No auto-save here, only on unlock/boost or manual save
+      checkRebirthUnlock();
     }, interval);
 
     updateAutoClickerButtons();
@@ -145,14 +144,41 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  // === Rebirth functionality ===
+  function checkRebirthUnlock() {
+    if (!rebirthUnlocked && clickerCounter >= rebirthThreshold) {
+      rebirthButton.style.display = "inline-block";
+    }
+  }
+
+  rebirthButton.addEventListener("click", () => {
+    if (clickerCounter >= rebirthThreshold && !rebirthUnlocked) {
+      // Apply rebirth
+      clickerCounter = 0;
+      autoClickerCount = 0;
+      rebirthUnlocked = true;
+      clickValue = 2;
+
+      if (autoClickerIntervalId) clearInterval(autoClickerIntervalId);
+      autoClickerIntervalId = null;
+
+      rebirthButton.style.display = "none";
+
+      alert("Rebirth complete! You now earn 2 color points per click.");
+
+      updateClickCounter();
+      updateAutoClickerButtons();
+      saveProgress();
+      localStorage.setItem("rebirthUnlocked", "true");
+    }
+  });
+
   // === Change background to random color and save it ===
   function changeBackgroundWithRandomColor() {
     const randomColor = `#${Math.floor(Math.random() * 16777215)
       .toString(16)
       .padStart(6, "0")}`;
     document.body.style.backgroundColor = randomColor;
-
-    // Save last color automatically
     localStorage.setItem("backgroundColor", randomColor);
   }
 
@@ -160,5 +186,11 @@ document.addEventListener("DOMContentLoaded", function () {
   function saveProgress() {
     localStorage.setItem("clickerCounter", clickerCounter);
     localStorage.setItem("autoClickerCount", autoClickerCount);
+    localStorage.setItem("rebirthUnlocked", rebirthUnlocked);
+  }
+
+  // === Get interval based on number of auto clickers ===
+  function getAutoClickerInterval() {
+    return Math.max(baseInterval / autoClickerCount, 300);
   }
 });
